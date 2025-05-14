@@ -16,22 +16,23 @@ AI 스타트업에 대한 투자 평가 에이전트를 설계하고 구현한 �
 
 ## Tech Stack
 
-| Category   | Details                           |
-| ---------- | --------------------------------- |
-| Framework  | LangGraph, Python                 |
-| LLM        | OpenAI GPT-3.5-turbo              |
-| Web Search | Tavily API                        |
-| Parser     | BeautifulSoup, Requests           |
-| Parallel   | ThreadPoolExecutor (for crawling) |
+| Category   | Details                 |
+| ---------- | ----------------------- |
+| Framework  | LangGraph, Python       |
+| LLM        | OpenAI GPT-3.5-turbo    |
+| Web Search | Tavily API              |
+| Parser     | BeautifulSoup, Requests |
 
-## Agents
+## Agents Overview
 
-- **StartupDispatchAgent**: 현재 평가 대상 스타트업을 모든 에이전트에게 전달
-- **TechReportAgent**: 해당 스타트업의 핵심 기술력과 구현 가능성을 분석 (RAG 기반 가능)
-- **MarketReportAgent**: 시장 규모, 수요, 성장 가능성 등을 평가
-- **CompetitorReportAgent**: 산업군 내 주요 경쟁사와의 비교를 통해 차별성과 리스크 분석 (WebSearch 기반)
-- **InvestmentAgent**: 기술, 시장, 경쟁사 분석 결과를 통합하여 투자 적합성 판단 (예: 투자 / 보류)
-- **ReportWriterAgent**: 5개 스타트업의 투자 판단 결과를 종합하여 최종 투자 보고서 생성
+| 에이전트 이름             | 설명                                                               | 구현 현황 / 위치                         |
+| ------------------------- | ------------------------------------------------------------------ | ---------------------------------------- |
+| **DispatchAgent**         | 현재 평가 대상 스타트업을 모든 에이전트에게 전달하는 역할          | `InvestmentAgent.ipynb` (추후 분리 예정) |
+| **TechReportAgent**       | 해당 스타트업의 핵심 기술력과 구현 가능성을 분석 (RAG 기반 가능)   | `agents/TechReportAgent.py`              |
+| **MarketReportAgent**     | 시장 규모, 수요, 성장 가능성 등을 평가 (WebSearch 기반)            | `agents/MarketReportAgent.py`            |
+| **CompetitorReportAgent** | 주요 경쟁사와의 비교를 통해 차별성 및 리스크 분석 (WebSearch 기반) | `agents/CompetitorReportAgent.py`        |
+| **InvestmentAgent**       | 기술, 시장, 경쟁 분석 결과를 종합하여 투자 여부 판단               | `InvestmentAgent.ipynb` (추후 분리 예정) |
+| **ReportWriterAgent**     | 개별 투자 판단 결과들을 종합하여 최종 투자 보고서 생성             | `InvestmentAgent.ipynb` (추후 분리 예정) |
 
 ## Architecture
 
@@ -56,10 +57,24 @@ flowchart TB
 ## Directory Structure
 
 ```
-├── data/ # 스타트업 기술 특허 정리 PDF 문서
-├── agents/ # 평가 기준별 Agent 모듈
-├── app.py # 실행 스크립트
-└── README.md
+ ┣ agents
+ ┃ ┣ CompetitorReportAgent.py
+ ┃ ┣ MarketReportAgent.py
+ ┃ ┗ TechReportAgent.py
+ ┣ data
+ ┃ ┣ AIRS_MEDICAL
+ ┃ ┃ ┗ AIRS_MEDICAL.pdf
+ ┃ ┣ NOTA
+ ┃ ┃ ┗ NOTA.pdf
+ ┃ ┣ RIIID
+ ┃ ┃ ┗ RIIID.pdf
+ ┃ ┣ TWELVE_LABS
+ ┃ ┃ ┗ TWELVE_LABS.pdf
+ ┃ ┗ UPSTAGE
+ ┃ ┃ ┗ UPSTAGE.pdf
+ ┣ .gitignore
+ ┣ InvestmentAgent.ipynb
+ ┗ README.md
 ```
 
 ## Contributors
