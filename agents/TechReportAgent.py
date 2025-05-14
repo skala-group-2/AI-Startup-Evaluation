@@ -12,6 +12,7 @@ from sentence_transformers import SentenceTransformer
 from chromadb import Client
 from chromadb.config import Settings
 from PyPDF2 import PdfReader
+from GraphState import GraphState
 
 # 환경변수 로드
 load_dotenv()
@@ -84,7 +85,7 @@ class QueryGenerator:
 class FeatureStructurer:
     def summarize(self, title: str, snippets: list[str]) -> str:
         joined = "\n\n".join(snippets[:5])
-        prompt = f"‘{title}’ 관련 핵심 정보를 5문장으로 요약하세요.\n\n{joined}"
+        prompt = f"‘{title}’ 관련 핵심 정보를 3문장으로 요약하세요.\n\n{joined}"
         resp = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role":"user","content":prompt}],
@@ -156,3 +157,15 @@ class IntegratedEvaluator:
             "tech_analysis": tech_analysis
         }
     
+def tech_agent(state: GraphState) -> GraphState:
+    """
+    기존 LLM 호출 대신, our IntegratedEvaluator 사용
+    """
+    evaluator = IntegratedEvaluator()
+    company = state["current_company"]
+    result = evaluator.evaluate(company, n_results=50, batch_size=5)
+    return {
+        **state,
+        "tech_report": result["summary"]
+        # "tech_detail": result["tech_analysis"]   # 키워드별 상세 분석
+    }

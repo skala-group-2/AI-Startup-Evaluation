@@ -1,12 +1,5 @@
-# pip install python-dotenv tavily-sdk beautifulsoup4 openai requests
-
 import os
 import logging
-import json
-# 로그 레벨 설정: INFO 이하 로깅 활성화 및 HTTPX/urllib3 INFO 로그 숨김
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("urllib3").setLevel(logging.WARNING)
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from bs4 import BeautifulSoup
@@ -16,15 +9,15 @@ from concurrent.futures import ThreadPoolExecutor
 from requests import get
 
 # (1) GraphState 정의
-class GraphState(TypedDict):
-    startup_list: List[str]
-    current_index: int
-    current_company: Optional[str]
+class GraphState(TypedDict):                 # 조사 대상 기업 목록
+    current_index: Optional[int]                        # 현재 조사 중인 기업 인덱스
+    current_company: Optional[str]               # 현재 기업 이름
     tech_report: Optional[str]
     competitor_report: Optional[str]
     market_report: Optional[str]
-    investment_summary: Optional[str]
-    reports: List[str]
+    investment_summary: Optional[str]  
+    investment_summary_retry_count: Optional[int]
+    reports: Optional[List[str]]
     final_report: Optional[str]
 
 # (2) 환경변수 로드
@@ -35,8 +28,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # (3) 로깅 설정
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-# WARNING 이하 로그 차단
-logger.setLevel(logging.ERROR)
 
 # (4) OpenAI 클라이언트 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -204,7 +195,6 @@ def format_market_report(result: Dict[str, Any]) -> str:
     return report
 
 # (12) market_agent
-
 def market_agent(state: GraphState) -> GraphState:
     company = state.get("current_company")
     if not company:
@@ -212,4 +202,5 @@ def market_agent(state: GraphState) -> GraphState:
     agent = MarketEvaluationAgent()
     result = agent.evaluate(company)
     report = format_market_report(result)
-    return {**state, "market_report": report}
+    return {"market_report": report}
+    # return {**state, "market_report": report}
